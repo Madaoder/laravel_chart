@@ -1,6 +1,6 @@
-<footer class="bg-dark text-white fixed-bottom">
-    <div class="container  py-5">
-        <div class="row">
+<footer class="bg-dark text-white">
+    <div class="container py-5">
+        <div class="row ms-5">
             <div class="col offset-md-1">
                 <h2>footer1</h2>
                 <ul class="list-unstyled">

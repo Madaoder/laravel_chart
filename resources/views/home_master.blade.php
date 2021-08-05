@@ -16,7 +16,9 @@
 
 <body>
     @include('layouts.header')
-    @yield('content')
+    <div class="min-vh-100">
+        @yield('content')
+    </div>
     @include('layouts.footer')
 </body>
 
