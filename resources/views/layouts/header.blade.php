@@ -14,13 +14,8 @@
                         <a class="nav-link" href="#">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Cart</a>
+                        <a class="nav-link" href="{{ url('cart/') }}">Cart</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('add/') }}">Add</a>
-                    </li>
-
-
                 </ul>
                 <ul class="navbar-nav">
                     @if(Auth::user())

@@ -15,4 +15,9 @@ class Item extends Model
         'price',
         'image'
     ];
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class);
+    }
 }
