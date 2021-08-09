@@ -15,24 +15,28 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($order->items as $item)
+            @foreach($items as $item)
             <tr>
                 <th scope="row">{{ $item->name }}</th>
                 <td>
-                    <select class="form-select" aria-label="Default select example">
-                        @for($i=1; $i<=10; $i++) @if($i==$item->pivot->qty)
-                            <option selected>{{ $item->pivot->qty }}</option>
-                            @else
-                            <option>{{ $i }}</option>
-                            @endif
-                            @endfor
-                    </select>
+                    <form name="qtyForm" id="{{ $item->id }}" action="{{ url('cart/'.$item->id) }}" method="POST">
+                        @csrf
+                        <select class="qtySelect" name="qty">
+                            @for($i=1; $i<=10; $i++) @if($i==$item->pivot->qty)
+                                <option selected>{{ $item->pivot->qty }}</option>
+                                @endif
+                                <option>{{ $i }}</option>
+                                @endfor
+                        </select>
+                    </form>
                 </td>
                 <td>{{ $item->price }}</td>
                 <td>{{ $item->price * $item->pivot->qty }}</td>
                 <td>able</td>
                 <td>
-                    <form action="">
+                    <form id="deleteForm" action="{{ url('cart/'.$item->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
                         <button class="btn btn-danger">delete</button>
                     </form>
                 </td>
@@ -42,4 +46,14 @@
     </table>
     total : {{ $order->sum }}
 </div>
+
+<script>
+    const selectElements = document.querySelectorAll('.qtySelect');
+    const items = <?php echo json_encode($items); ?>;
+    for (let i = 0; i < selectElements.length; i++) {
+        selectElements[i].addEventListener('change', (event) => {
+            document.getElementById(`${items[i].id}`).submit();
+        });
+    };
+</script>
 @endsection

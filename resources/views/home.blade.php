@@ -25,7 +25,7 @@
                         <div class="card-body">
                             <a class="card-text" href="">{{ $item->name }}</a>
                             <p>$ {{ $item->price }}</p>
-                            <a class="btn btn-success" href="{{ url('add/chart/'.$item->id) }}">add to chart</a>
+                            <a class="btn btn-success" href="{{ url('cart/'.$item->id) }}">add to chart</a>
                         </div>
                     </div>
                 </div>

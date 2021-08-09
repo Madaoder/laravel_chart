@@ -25,21 +25,9 @@ Route::get('/', function () {
 });
 
 Route::get('/cart', [CartController::class, 'showCart'])->middleware('auth');
-
-Route::get('/add/chart/{id}', function ($id) {
-    $orderCheck = Order::where('user_id', Auth::user()->id)->first();
-    //Wether user have order or not
-    if (!$orderCheck) {
-        Order::create(['user_id' => Auth::user()->id]);
-    }
-    $itemCheck = $orderCheck->items()->where('item_id', $id)->first();
-    //Wether user have add this item to the chart or not
-    if (!$itemCheck) {
-        $item = Item::find($id);
-        $orderCheck->items()->attach($item->id, ['qty' => 1]);
-    }
-    return Redirect()->back();
-})->middleware('auth');
+Route::get('/cart/{id}', [CartController::class, 'addItem'])->middleware('auth');
+Route::post('/cart/{id}', [CartController::class, 'changeQty'])->middleware('auth');
+Route::delete('/cart/{id}', [CartController::class, 'deleteItem'])->middleware('auth');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('home');
