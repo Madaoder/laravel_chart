@@ -21,13 +21,13 @@ use Illuminate\Support\Facades\Redirect;
 
 Route::get('/', function () {
     $items = Item::all();
-    return view('home', compact('items'));
+    return view('home', ['items' => $items]);
 });
 
-Route::get('/cart', [CartController::class, 'showCart'])->middleware('auth');
-Route::get('/cart/{id}', [CartController::class, 'addItem'])->middleware('auth');
-Route::post('/cart/{id}', [CartController::class, 'changeQty'])->middleware('auth');
-Route::delete('/cart/{id}', [CartController::class, 'deleteItem'])->middleware('auth');
+Route::get('/cart', [CartController::class, 'showCart']);
+Route::get('/cart/{id}', [CartController::class, 'addItem']);
+Route::post('/cart/{id}', [CartController::class, 'changeQty']);
+Route::delete('/cart/{id}', [CartController::class, 'deleteItem']);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('home');

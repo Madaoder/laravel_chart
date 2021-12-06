@@ -9,43 +9,59 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    public function showCart()
+    public function showCart(Request $request)
     {
-        $order = Order::where('user_id', Auth::user()->id)->first();
-        $items = $order->items()->orderBy('price')->get();
-        return view('cart.show', compact('order', 'items'));
+        $orders = $request->session()->get('cart');
+        $total = $request->session()->get('total');
+        return view('cart.show', ['orders' => $orders, 'total' => $total]);
     }
 
-    public function addItem($id)
+    public function addItem(Request $request, $id)
     {
-        $orderCheck = Order::where('user_id', Auth::user()->id)->first();
-        //Wether user have order or not
-        if (!$orderCheck) {
-            Order::create(['user_id' => Auth::user()->id]);
+        $item = Item::find($id);
+        $newOrder = [
+            'item' => $item,
+            'qty' => 1,
+        ];
+        if ($request->session()->has('cart')) {
+            $order = $request->session()->get('cart');
+            if (array_key_exists($id, $order)) {
+                $order[$id]['qty']++;
+            } else {
+                $order[$id] = $newOrder;
+            }
+        } else {
+            $order[$id] = $newOrder;
         }
-        $itemCheck = $orderCheck->items()->where('item_id', $id)->first();
-        //Wether user have add this item to the chart or not
-        if (!$itemCheck) {
-            $item = Item::find($id);
-            $orderCheck->items()->attach($item->id, ['qty' => 1]);
-        }
+        $total = $request->session()->has('total') ? $request->session()->get('total') : 0;
+        $total += $item->price;
+        $request->session()->put('cart', $order);
+        $request->session()->put('total', $total);
         return Redirect()->back();
     }
 
     public function changeQty(Request $request, $id)
     {
+        $order = $request->session()->get('cart');
+        $total = $request->session()->get('total');
         $qty = $request->qty;
-        $order = Order::where('user_id', Auth::user()->id)->first();
-        $item = Item::find($id);
-        $order->items()->updateExistingPivot($item->id, ['qty' => $qty]);
-        return Redirect()->back();
+        $oldQty = $order[$id]['qty'];
+        $diff = $qty - $oldQty;
+        $order[$id]['qty'] = $qty;
+        $total += $diff * $order[$id]['item']->price;
+        $request->session()->put('cart', $order);
+        $request->session()->put('total', $total);
+        return Redirect()->action([CartController::class, 'showCart']);
     }
 
-    public function deleteItem($id)
+    public function deleteItem(Request $request, $id)
     {
-        $order = Order::where('user_id', Auth::user()->id)->first();
-        $item = Item::find($id);
-        $order->items()->detach($item->id);
-        return Redirect()->back();
+        $order = $request->session()->get('cart');
+        $total = $request->session()->get('total');
+        $total -= $order[$id]['qty'] * $order[$id]['item']->price;
+        unset($order[$id]);
+        $request->session()->put('cart', $order);
+        $request->session()->put('total', $total);
+        return Redirect()->action([CartController::class, 'showCart']);
     }
 }
