@@ -11,57 +11,69 @@ class CartController extends Controller
 {
     public function showCart(Request $request)
     {
-        $orders = $request->session()->get('cart');
+        $cart = $request->session()->get('cart');
         $total = $request->session()->get('total');
-        return view('cart.show', ['orders' => $orders, 'total' => $total]);
+        return view('cart.show', ['items' => $cart, 'total' => $total]);
     }
 
     public function addItem(Request $request, $id)
     {
         $item = Item::find($id);
-        $newOrder = [
-            'item' => $item,
+        $newCart = [
+            'id' => $item->id,
+            'name' => $item->name,
+            'price' => $item->price,
             'qty' => 1,
         ];
-        if ($request->session()->has('cart')) {
-            $order = $request->session()->get('cart');
-            if (array_key_exists($id, $order)) {
-                $order[$id]['qty']++;
-            } else {
-                $order[$id] = $newOrder;
-            }
+        $cart = $request->session()->has('cart') ? $request->session()->get('cart') : [];
+        if (array_key_exists($id, $cart)) {
+            $cart[$id]['qty']++;
         } else {
-            $order[$id] = $newOrder;
+            $cart[$id] = $newCart;
         }
         $total = $request->session()->has('total') ? $request->session()->get('total') : 0;
         $total += $item->price;
-        $request->session()->put('cart', $order);
+        $request->session()->put('cart', $cart);
         $request->session()->put('total', $total);
         return Redirect()->back();
     }
 
     public function changeQty(Request $request, $id)
     {
-        $order = $request->session()->get('cart');
+        $cart = $request->session()->get('cart');
         $total = $request->session()->get('total');
         $qty = $request->qty;
-        $oldQty = $order[$id]['qty'];
+        $oldQty = $cart[$id]['qty'];
         $diff = $qty - $oldQty;
-        $order[$id]['qty'] = $qty;
-        $total += $diff * $order[$id]['item']->price;
-        $request->session()->put('cart', $order);
+        $cart[$id]['qty'] = $qty;
+        $total += $diff * $cart[$id]['price'];
+        $request->session()->put('cart', $cart);
         $request->session()->put('total', $total);
         return Redirect()->action([CartController::class, 'showCart']);
     }
 
     public function deleteItem(Request $request, $id)
     {
-        $order = $request->session()->get('cart');
+        $cart = $request->session()->get('cart');
         $total = $request->session()->get('total');
-        $total -= $order[$id]['qty'] * $order[$id]['item']->price;
-        unset($order[$id]);
-        $request->session()->put('cart', $order);
+        $total -= $cart[$id]['qty'] * $cart[$id]['price'];
+        unset($cart[$id]);
+        $request->session()->put('cart', $cart);
         $request->session()->put('total', $total);
         return Redirect()->action([CartController::class, 'showCart']);
+    }
+
+    public function buyItem(Request $request)
+    {
+        $order = $request->session()->get('cart');
+        $total = $request->session()->get('total');
+        $tradeNo = bin2hex(random_bytes(9));
+        Order::create([
+            'user_id' => Auth::id(),
+            'order' => serialize($order),
+            'total' => $total,
+            'trade_no' => $tradeNo,
+        ]);
+        $request->session()->flush();
     }
 }

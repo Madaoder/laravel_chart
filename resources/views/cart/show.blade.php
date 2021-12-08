@@ -14,24 +14,24 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($orders as $order)
+            @foreach($items as $item)
             <tr>
-                <th scope="row">{{ $order['item']->name }}</th>
+                <th scope="row">{{ $item['name'] }}</th>
                 <td>
-                    <form name="qtyForm" id="{{ 'item'.$order['item']->id }}" action="{{ url('cart/'.$order['item']->id) }}" method="POST">
+                    <form name="qtyForm" id="{{ 'item'.$item['id'] }}" action="{{ url('cart/'.$item['id']) }}" method="POST">
                         @csrf
-                        <select class="qtySelect" name="qty" id="{{ $order['item']->id }}">
-                            @for($i=1; $i<=10; $i++) @if($i==$order['qty']) <option selected>{{ $order['qty'] }}</option>
+                        <select class="qtySelect" name="qty" id="{{ $item['id'] }}">
+                            @for($i=1; $i<=10; $i++) @if($i==$item['qty']) <option selected>{{ $item['qty'] }}</option>
                                 @endif
                                 <option>{{ $i }}</option>
                                 @endfor
                         </select>
                     </form>
                 </td>
-                <td>{{ $order['item']->price }}</td>
-                <td>{{ $order['item']->price * $order['qty'] }}</td>
+                <td>{{ $item['price'] }}</td>
+                <td>{{ $item['price'] * $item['qty'] }}</td>
                 <td>
-                    <form id="deleteForm" action="{{ url('cart/'.$order['item']->id) }}" method="POST">
+                    <form id="deleteForm" action="{{ url('cart/'.$item['id']) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-danger">delete</button>
@@ -46,7 +46,7 @@
 
 <script>
     const selectElements = document.querySelectorAll('.qtySelect');
-    const orders = <?php echo json_encode($orders); ?>;
+    const items = <?php echo json_encode($items); ?>;
     for (let i = 0; i < selectElements.length; i++) {
         selectElements[i].addEventListener('change', (event) => {
             document.getElementById(`item${selectElements[i].id}`).submit();

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controller;
 
 use App\Models\Item;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -55,5 +56,16 @@ class CartControllerTest extends TestCase
         $response = $this->delete('/cart/' . $item1->id);
         $response->dumpSession();
         $response->assertStatus(302);
+    }
+
+    public function test_order_to_database()
+    {
+        $this->withExceptionHandling();
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $item1 = Item::factory()->create();
+        $response = $this->get('/cart/' . $item1->id);
+        $response = $this->get('/cart/buy');
+        $this->assertDatabaseCount('orders', 1);
     }
 }

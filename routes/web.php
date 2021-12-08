@@ -25,6 +25,7 @@ Route::get('/', function () {
 });
 
 Route::get('/cart', [CartController::class, 'showCart']);
+Route::get('/cart/buy', [CartController::class, 'buyItem']);
 Route::get('/cart/{id}', [CartController::class, 'addItem']);
 Route::post('/cart/{id}', [CartController::class, 'changeQty']);
 Route::delete('/cart/{id}', [CartController::class, 'deleteItem']);

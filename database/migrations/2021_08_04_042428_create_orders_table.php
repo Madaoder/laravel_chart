@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id('id');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('order');
+            $table->bigInteger('total');
             $table->string('trade_no');
             $table->timestamps();
         });

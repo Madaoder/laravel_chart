@@ -25,3 +25,5 @@
     - component可以主頁面的資料帶入，產生不一樣的頁面效果
 - 在testing得時候Item::factory()->make()顯示id is null
     - 使用Item::factory()->create()
+- syntax error, unexpected single-quoted string "); ", expecting ")" (View: C:\xampp\htdocs\shop\project_chart\resources\views\cart\show.blade.php)
+    - 
