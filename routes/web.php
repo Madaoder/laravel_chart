@@ -2,11 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
 use App\Models\Item;
-use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +21,8 @@ Route::get('/', function () {
 });
 
 Route::get('/cart', [CartController::class, 'showCart']);
-Route::get('/cart/buy', [CartController::class, 'buyItem']);
+Route::get('/cart/buy', [CartController::class, 'buyItem'])->middleware('auth');
+Route::post('/cart/callback', [CartController::class, 'callback']);
 Route::get('/cart/{id}', [CartController::class, 'addItem']);
 Route::post('/cart/{id}', [CartController::class, 'changeQty']);
 Route::delete('/cart/{id}', [CartController::class, 'deleteItem']);

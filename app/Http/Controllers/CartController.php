@@ -6,6 +6,9 @@ use App\Models\Item;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Ecpay\Sdk\Factories\Factory;
+use Ecpay\Sdk\Services\UrlService;
+use Ecpay\Sdk\Exceptions\RtnException;
 
 class CartController extends Controller
 {
@@ -75,5 +78,40 @@ class CartController extends Controller
             'trade_no' => $tradeNo,
         ]);
         $request->session()->flush();
+        try {
+            $factory = new Factory([
+                'hashKey' => '5294y06JbISpM5x9',
+                'hashId' => 'v77hoKGq4kWxNNIS'
+            ]);
+            $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
+
+            $input = [
+                'MerchantID' => '2000132',
+                'MerchantTradeNo' => $tradeNo,
+                'MerchantTradeDate' => date('Y/m/d H:i:s'),
+                'PaymentType' => 'aio',
+                'TotalAmount' => 100,
+                'TradeDesc' => UrlService::ecpayUrlEncode('交易描述範例'),
+                'ItemName' => '範例信用卡交易',
+                'ReturnURL' => '',
+                'ClientBackURL' => '',
+                'ChoosePayment' => 'Credit',
+                'EncryptType' => 1,
+            ];
+
+            $action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
+
+            echo $autoSubmitFormService->generate($input, $action);
+        } catch (RtnException $e) {
+            echo '(', $e->getCode() . ')' . $e->getMessage() . PHP_EOL;
+        }
+    }
+
+    public function callback(Request $request)
+    {
+        if ($request->RtnCode === 1) {
+            Order::where('trade_no', $request->MerchantTradeNo)
+                ->update(['paid', 1]);
+        }
     }
 }

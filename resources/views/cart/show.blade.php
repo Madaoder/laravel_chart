@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="container-xxl my-md-4 bd-layout">
+<div class="container my-md-4 bd-layout">
     <table class="table">
         <thead>
             <tr>
@@ -14,6 +14,7 @@
             </tr>
         </thead>
         <tbody>
+            @if($items)
             @foreach($items as $item)
             <tr>
                 <th scope="row">{{ $item['name'] }}</th>
@@ -39,18 +40,20 @@
                 </td>
             </tr>
             @endforeach
+            @else
+            <tr>
+                <th>buy something!!</th>
+            </tr>
+            @endif
         </tbody>
     </table>
-    total : {{ $total }}
+    <div class="d-flex">
+        <div>
+            total : {{ $total }}
+        </div>
+        <a class="ms-auto" href="{{ url('cart/buy') }}">buy</a>
+    </div>
 </div>
 
-<script>
-    const selectElements = document.querySelectorAll('.qtySelect');
-    const items = <?php echo json_encode($items); ?>;
-    for (let i = 0; i < selectElements.length; i++) {
-        selectElements[i].addEventListener('change', (event) => {
-            document.getElementById(`item${selectElements[i].id}`).submit();
-        });
-    };
-</script>
+<script src="{{ url('js/qtyChange.js') }}"></script>
 @endsection
