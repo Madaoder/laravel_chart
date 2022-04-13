@@ -24,14 +24,14 @@ class ItemSeeder extends Seeder
         $image7 = Image::make('public/images/image7.jpg')->resize(300, 200)->save('public/images/keyboard1.jpg');
         $image8 = Image::make('public/images/image8.jpg')->resize(300, 200)->save('public/images/keyboard2.jpg');
         $image9 = Image::make('public/images/image9.jpg')->resize(300, 200)->save('public/images/keyboard3.jpg');
-        Item::create(['name' => 'computer1', 'price' => '15000', 'image' => 'images/computer1.jpg']);
-        Item::create(['name' => 'computer2', 'price' => '20000', 'image' => 'images/computer2.jpg']);
-        Item::create(['name' => 'computer3', 'price' => '40000', 'image' => 'images/computer3.jpg']);
-        Item::create(['name' => 'mouse1', 'price' => '800', 'image' => 'images/mouse1.jpg']);
-        Item::create(['name' => 'mouse2', 'price' => '2000', 'image' => 'images/mouse2.jpg']);
-        Item::create(['name' => 'mouse3', 'price' => '480', 'image' => 'images/mouse3.jpg']);
-        Item::create(['name' => 'keyboard1', 'price' => '1500', 'image' => 'images/keyboard1.jpg']);
-        Item::create(['name' => 'keyboard2', 'price' => '300', 'image' => 'images/keyboard2.jpg']);
-        Item::create(['name' => 'keyboard3', 'price' => '4000', 'image' => 'images/keyboard3.jpg']);
+        Item::create(['name' => 'computer1', 'price' => '15000', 'image' => 'images/computer1.jpg', 'tag' => 'computer']);
+        Item::create(['name' => 'computer2', 'price' => '20000', 'image' => 'images/computer2.jpg', 'tag' => 'computer']);
+        Item::create(['name' => 'computer3', 'price' => '40000', 'image' => 'images/computer3.jpg', 'tag' => 'computer']);
+        Item::create(['name' => 'mouse1', 'price' => '800', 'image' => 'images/mouse1.jpg', 'tag' => 'mouse']);
+        Item::create(['name' => 'mouse2', 'price' => '2000', 'image' => 'images/mouse2.jpg', 'tag' => 'mouse']);
+        Item::create(['name' => 'mouse3', 'price' => '480', 'image' => 'images/mouse3.jpg', 'tag' => 'mouse']);
+        Item::create(['name' => 'keyboard1', 'price' => '1500', 'image' => 'images/keyboard1.jpg', 'tag' => 'keyboard']);
+        Item::create(['name' => 'keyboard2', 'price' => '300', 'image' => 'images/keyboard2.jpg', 'tag' => 'keyboard']);
+        Item::create(['name' => 'keyboard3', 'price' => '4000', 'image' => 'images/keyboard3.jpg', 'tag' => 'keyboard']);
     }
 }

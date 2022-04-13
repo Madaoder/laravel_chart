@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Item;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,10 +15,10 @@ use App\Models\Item;
 |
 */
 
-Route::get('/', function () {
-    $items = Item::all();
-    return view('home', ['items' => $items]);
-});
+Route::get('/', [HomeController::class, 'home']);
+Route::get('/computer', [HomeController::class, 'computer']);
+Route::get('/mouse', [HomeController::class, 'mouse']);
+Route::get('/keyboard', [HomeController::class, 'keyboard']);
 
 Route::get('/cart', [CartController::class, 'showCart']);
 Route::get('/cart/buy', [CartController::class, 'buyItem'])->middleware('auth');

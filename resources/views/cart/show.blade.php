@@ -51,7 +51,7 @@
         <div>
             total : {{ $total }}
         </div>
-        <a class="ms-auto" href="{{ url('cart/buy') }}">buy</a>
+        <a class="ms-auto btn btn-success" href="{{ url('cart/buy') }}">buy</a>
     </div>
 </div>
 

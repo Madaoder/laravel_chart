@@ -1,5 +1,6 @@
 ## laravel簡易購物車
 - 建立、修改、刪除訂單
+- 連接第三方支付
 - adminAc:wayne@mail.com
 - adminPw:wayne123
 
@@ -11,6 +12,7 @@
 - 前端:bootstrap
 - 框架:laravel
 - 資料庫:mySQL
+- 伺服器:aws
 
 ## 遇到問題
 - 使用Order->items()->attach()的時候Illuminate\Database\Eloquent\Collection::items
@@ -25,5 +27,3 @@
     - component可以主頁面的資料帶入，產生不一樣的頁面效果
 - 在testing得時候Item::factory()->make()顯示id is null
     - 使用Item::factory()->create()
-- syntax error, unexpected single-quoted string "); ", expecting ")" (View: C:\xampp\htdocs\shop\project_chart\resources\views\cart\show.blade.php)
-    - 
