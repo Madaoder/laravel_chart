@@ -81,7 +81,7 @@ class CartController extends Controller
         try {
             $factory = new Factory([
                 'hashKey' => '5294y06JbISpM5x9',
-                'hashId' => 'v77hoKGq4kWxNNIS'
+                'hashIv' => 'v77hoKGq4kWxNNIS'
             ]);
             $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
@@ -90,14 +90,16 @@ class CartController extends Controller
                 'MerchantTradeNo' => $tradeNo,
                 'MerchantTradeDate' => date('Y/m/d H:i:s'),
                 'PaymentType' => 'aio',
-                'TotalAmount' => 100,
+                'TotalAmount' => $total,
                 'TradeDesc' => UrlService::ecpayUrlEncode('交易描述範例'),
                 'ItemName' => '範例信用卡交易',
-                'ReturnURL' => '',
-                'ClientBackURL' => '',
+                'ReturnURL' => 'http://7ea8-1-165-201-77.ngrok.io/cart/callback',
+                'ClientBackURL' => 'http://7ea8-1-165-201-77.ngrok.io',
                 'ChoosePayment' => 'Credit',
                 'EncryptType' => 1,
             ];
+
+            $input['CheckMacValue'] = CheckMacValue::generate($input, '5294y06JbISpM5x9', 'v77hoKGq4kWxNNIS');
 
             $action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
 
@@ -113,5 +115,44 @@ class CartController extends Controller
             Order::where('trade_no', $request->MerchantTradeNo)
                 ->update(['paid', 1]);
         }
+    }
+}
+
+class CheckMacValue
+{
+    static function generate($arParameters = array(), $HashKey = "", $HashIV = "")
+    {
+        $sMacValue = "";
+        if (isset($arParameters)) {
+            unset($arParameters['CheckMacValue']);
+            uksort($arParameters, array('App\Http\Controllers\CheckMacValue', 'merchantSort'));
+
+            $sMacValue = "HashKey=" . $HashKey;
+            foreach ($arParameters as $key => $value) {
+                $sMacValue .= "&" . $key . "=" . $value;
+            }
+            $sMacValue .= "&HashIV=" . $HashIV;
+
+            $sMacValue = urlencode($sMacValue);
+
+            $sMacValue = strtolower($sMacValue);
+
+            $sMacValue = str_replace('%2d', '-', $sMacValue);
+            $sMacValue = str_replace('%5f', '_', $sMacValue);
+            $sMacValue = str_replace('%2e', '.', $sMacValue);
+            $sMacValue = str_replace('%21', '!', $sMacValue);
+            $sMacValue = str_replace('%2a', '*', $sMacValue);
+            $sMacValue = str_replace('%28', '(', $sMacValue);
+            $sMacValue = str_replace('%29', ')', $sMacValue);
+
+            $sMacValue = hash('sha256', $sMacValue);
+            $sMacValue = strtoupper($sMacValue);
+        }
+        return $sMacValue;
+    }
+
+    private static function merchantSort($a, $b)
+    {
+        return strcasecmp($a, $b);
     }
 }
