@@ -68,8 +68,8 @@ class CartController extends Controller
 
     public function buyItem(Request $request)
     {
-        $order = $request->session()->get('cart');
-        $total = $request->session()->get('total');
+        $order = $request->session()->pull('cart');
+        $total = $request->session()->pull('total');
         $tradeNo = bin2hex(random_bytes(9));
         Order::create([
             'user_id' => Auth::id(),
@@ -77,7 +77,6 @@ class CartController extends Controller
             'total' => $total,
             'trade_no' => $tradeNo,
         ]);
-        $request->session()->flush();
         try {
             $factory = new Factory([
                 'hashKey' => '5294y06JbISpM5x9',
