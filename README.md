@@ -17,6 +17,6 @@
 
 ## 使用工具
 - 前端:bootstrap
-- 框架:laravel
+- 後端框架:laravel
 - 資料庫:mySQL
 - 伺服器:aws
