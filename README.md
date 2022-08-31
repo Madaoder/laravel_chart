@@ -1,29 +1,22 @@
 ## laravel簡易購物車
-- 建立、修改、刪除訂單
-- 連接第三方支付
+- 網址:http://ec2-13-231-241-53.ap-northeast-1.compute.amazonaws.com/
 - adminAc:wayne@mail.com
 - adminPw:wayne123
+- 信用卡測試卡號:4311-9522-2222-2222
+- 信用卡測試安全碼:222
+- 信用卡有效年月:請大於現在當下時間的月年
+
+## 功能
+- 建立、修改、刪除訂單
+- 連接第三方支付(綠界)
 
 ## 學習目標
 - RESTful API
 - M:N relationship
+- unit test
 
 ## 使用工具
 - 前端:bootstrap
-- 框架:laravel
+- 後端框架:laravel
 - 資料庫:mySQL
 - 伺服器:aws
-
-## 遇到問題
-- 使用Order->items()->attach()的時候Illuminate\Database\Eloquent\Collection::items
-    - 在使用query builder的時候find()與where()的不同，find()傳回的是instance(parameter是primary key所以回傳是單一物件)，where()搭配get()傳回的是collection(不只一個物件)
-- 使用下拉選單選擇購物車商品數量時改變小計
-    - 在<select>增加屬性onchange，在改變選單時觸發javascript的函式submit()
-- onchange無法動作
-    - 使用<script>寫DOM'change'時submit()
-- 使用下拉選單選擇購物車商品數量時商品位置因創造時間先後而亂跳導致購買數量與上品id在post的時候對不上，導致購買數量錯誤
-    - 在controller不使用with('items')而是使用$order->items()另外提取商品在做orderBy()固定商品位置
-- component與include的差別
-    - component可以主頁面的資料帶入，產生不一樣的頁面效果
-- 在testing得時候Item::factory()->make()顯示id is null
-    - 使用Item::factory()->create()
