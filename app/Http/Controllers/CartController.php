@@ -6,9 +6,6 @@ use App\Models\Item;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Ecpay\Sdk\Factories\Factory;
-use Ecpay\Sdk\Services\UrlService;
-use Ecpay\Sdk\Exceptions\RtnException;
 
 class CartController extends Controller
 {
@@ -55,7 +52,7 @@ class CartController extends Controller
         return Redirect()->action([CartController::class, 'showCart']);
     }
 
-    public function deleteItem(Request $request, $id)
+    public function deleteItem(Request $request, int $id)
     {
         $cart = $request->session()->get('cart');
         $total = $request->session()->get('total');
@@ -71,41 +68,13 @@ class CartController extends Controller
         $order = $request->session()->pull('cart');
         $total = $request->session()->pull('total');
         $tradeNo = bin2hex(random_bytes(9));
-        Order::create([
+        $order = Order::create([
             'user_id' => Auth::id(),
             'order' => serialize($order),
             'total' => $total,
             'trade_no' => $tradeNo,
         ]);
-        try {
-            $factory = new Factory([
-                'hashKey' => '5294y06JbISpM5x9',
-                'hashIv' => 'v77hoKGq4kWxNNIS'
-            ]);
-            $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
-
-            $input = [
-                'MerchantID' => '2000132',
-                'MerchantTradeNo' => $tradeNo,
-                'MerchantTradeDate' => date('Y/m/d H:i:s'),
-                'PaymentType' => 'aio',
-                'TotalAmount' => $total,
-                'TradeDesc' => UrlService::ecpayUrlEncode('交易描述範例'),
-                'ItemName' => '範例信用卡交易',
-                'ReturnURL' => 'http://7ea8-1-165-201-77.ngrok.io/cart/callback',
-                'ClientBackURL' => 'http://7ea8-1-165-201-77.ngrok.io',
-                'ChoosePayment' => 'Credit',
-                'EncryptType' => 1,
-            ];
-
-            $input['CheckMacValue'] = CheckMacValue::generate($input, '5294y06JbISpM5x9', 'v77hoKGq4kWxNNIS');
-
-            $action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
-
-            echo $autoSubmitFormService->generate($input, $action);
-        } catch (RtnException $e) {
-            echo '(', $e->getCode() . ')' . $e->getMessage() . PHP_EOL;
-        }
+        $order->moveToBuyPage($tradeNo);
     }
 
     public function callback(Request $request)
@@ -114,44 +83,5 @@ class CartController extends Controller
             Order::where('trade_no', $request->MerchantTradeNo)
                 ->update(['paid', 1]);
         }
-    }
-}
-
-class CheckMacValue
-{
-    static function generate($arParameters = array(), $HashKey = "", $HashIV = "")
-    {
-        $sMacValue = "";
-        if (isset($arParameters)) {
-            unset($arParameters['CheckMacValue']);
-            uksort($arParameters, array('App\Http\Controllers\CheckMacValue', 'merchantSort'));
-
-            $sMacValue = "HashKey=" . $HashKey;
-            foreach ($arParameters as $key => $value) {
-                $sMacValue .= "&" . $key . "=" . $value;
-            }
-            $sMacValue .= "&HashIV=" . $HashIV;
-
-            $sMacValue = urlencode($sMacValue);
-
-            $sMacValue = strtolower($sMacValue);
-
-            $sMacValue = str_replace('%2d', '-', $sMacValue);
-            $sMacValue = str_replace('%5f', '_', $sMacValue);
-            $sMacValue = str_replace('%2e', '.', $sMacValue);
-            $sMacValue = str_replace('%21', '!', $sMacValue);
-            $sMacValue = str_replace('%2a', '*', $sMacValue);
-            $sMacValue = str_replace('%28', '(', $sMacValue);
-            $sMacValue = str_replace('%29', ')', $sMacValue);
-
-            $sMacValue = hash('sha256', $sMacValue);
-            $sMacValue = strtoupper($sMacValue);
-        }
-        return $sMacValue;
-    }
-
-    private static function merchantSort($a, $b)
-    {
-        return strcasecmp($a, $b);
     }
 }
