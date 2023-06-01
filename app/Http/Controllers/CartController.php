@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Order;
+use App\Services\EcpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -68,20 +70,22 @@ class CartController extends Controller
         $order = $request->session()->pull('cart');
         $total = $request->session()->pull('total');
         $tradeNo = bin2hex(random_bytes(9));
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'order' => serialize($order),
-            'total' => $total,
-            'trade_no' => $tradeNo,
-        ]);
-        $order->moveToBuyPage($tradeNo);
+        DB::transaction(function () use ($order, $total, $tradeNo) {
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'order' => serialize($order),
+                'total' => $total,
+                'trade_no' => $tradeNo,
+            ]);
+            EcpayService::moveToBuyPage($tradeNo, $order);
+        });
     }
 
     public function callback(Request $request)
     {
+        $order = Order::where('trade_no', $request->MerchantTradeNo);
         if ($request->RtnCode === 1) {
-            Order::where('trade_no', $request->MerchantTradeNo)
-                ->update(['paid', 1]);
+            $order->update(['paid', 1]);
         }
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
-class CheckMacValue
+class MacValueService
 {
     public static function generate($arParameters = array(), $hashKey = "", $hashIV = "")
     {
         $sMacValue = "";
         if (isset($arParameters)) {
             unset($arParameters['CheckMacValue']);
-            uksort($arParameters, array('App\Http\Controllers\CheckMacValue', 'merchantSort'));
+            uksort($arParameters, array('App\Services\MacValueService', 'merchantSort'));
 
             $sMacValue = "hashKey=" . $hashKey;
             foreach ($arParameters as $key => $value) {
